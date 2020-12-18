@@ -1,75 +1,85 @@
-/*
+/**
+ *
+ * Name: BRO Slider
+ * Description: This script uses for creating u beatiful and usability slider.
+ *
+ * Version: alpha 0.9.1
+ * Date for last update: 2017-12-30
+ * Date create: 2017-11-15
+ *
+ * Email author: d1d2c0d1@gmail.com
+ *
+ *
+ * Thank's for watch and use this script!
+ *
+ */
 
-  Name: BRO Slider
-  Description: This script uses for creating u beatiful and usability slider.
+let CSlider = {
 
-  Version: alpha 0.9.0
-  Date Last Update: 2017-12-28
-  Date create: 2017-11-15
+    
+    /**
+     * 
+     * Global object parameters for slider work cycle
+     * 
+     */
 
-  Email author: d1d2c0d1@gmail.com
-  Company email: hello@studio.country
-
-  If you want a help autor company you can write email message on
-  hello@studio.country and tell u quest.
-
-  Thank's for watch and use this script!
-
-
-*/
-
-var CSlider = {
-
-    // Глобальные свойства библиотеки
-    fn: "function",
+    // Another data (You can fix this if you want that, i'm create this three years old, sorry bro)
+    fn: "function", 
     string: "string",
     object: "object",
     undef: "undefined",
-    animateSpeed: "0.3s",
+
+    animateSpeed: "0.3s", // Slider animate speed
     arrMaxSpeedDelimiter: [],
     arrSpeedDelimiterIterator: [],
 
-    sliderClass: "cslider",  // стандартный класс обертки слайдера
-    slidesClass: "slides",   // стандартный класс обертки слайдов
-    slideClass: "slide",    // стандартный класс слайда
-    sliderSClass: "slider",
+    sliderClass: "cslider",     // Default class for main container
+    slidesClass: "slides",      // Default class for slides container
+    slideClass: "slide",        // Default class for slide container
+    sliderSClass: "slider", 
     activeSlideClass: "active",
     navClassDisabled: "disabled",
     pointsClass: "slider-points",
     pointCurrentClass: "current",
     pointClass: "dot",
 
-    sliderNavClass: "slider-nav", // стандартный класс навигации слайдера
-    sliderNavNextClass: "next",       // стандартный класс элемента «далее»
-    sliderNavPrevClass: "prev",       // стандартный класс элемента «назад»
+    sliderNavClass: "slider-nav",       // Default class for slider navigate
+    sliderNavNextClass: "next",         // Default class for navigate button to "Next"
+    sliderNavPrevClass: "prev",         // Default class for navigate button to "Previous"
 
-    enableDrag: false,       // включить драг события
-    percentToSwipe: 7,
+    enableDrag: false,          // Enable (true) draggable events
+    percentToSwipe: 7,          // How many percent was need for work swipe event
 
-    slideWidth: 0,          // ширина одного слайда (будет определена в инициаторе)
-    arrTransforms: [],         // массив с трансформацией (будет определена в инициаторе)
-    arrActiveSlide: [],         // массив активных слайдов для разных слайдеров (будет определена в инициаторе)
-    arrSlideWidth: [],         // массив с шириной каждого слайда из набора слайдеров на странице (будет определена в инициаторе)
-    arrCountSlides: [],         // массив с количествами слайдов в каждом слайдере
-    arrSliders: [],         // Массив всех слайдеров
-    arrSlidersWidth: [],         // массив после иниициализации содержит ширину всех слайдеров
-    arrCountViewSlide: [],         // полученное количество слайдов для показа
-    arrNav: [],         // все навигации по слайдерам
-    arrPoints: [],         // все наборы точек
-    arrEnablePoints: [],         // включение выключение обработки точек (нагрузка на клиента увеличивается при включенных точках)
-    arrBackgroundImages: [],      // изображения для подгрузки во времявыполнения
-    arrSliderViewPoints: [],      // показывать точки или нет
+    slideWidth: 0,              // Slide width (was find in init method)
+    arrTransforms: [],          // Array with transforms (was fill in init method)
+    arrActiveSlide: [],         // Array of slides for all sliders on page (was fill in init method)
+    arrSlideWidth: [],          // Array of witdh slides for all sliders on page (was fill in init method)
+    arrCountSlides: [],         // Array of counted all slides for all sliders on page (was fill in init method)
+    arrSliders: [],             // Array of all sliders on page (was fill in init method)
+    arrSlidersWidth: [],        // Array of width all sliders containers (was fill in init method)
+    arrCountViewSlide: [],      // Array of count view slides (for lazy load/was fill in init method)
+    arrNav: [],                 // Array of navigation bars for all sliders on page (was fill in init method)
+    arrPoints: [],              // Array of points bars for all sliders on page (was fill in init method)
+    arrEnablePoints: [],        // Array of Enableds or disableds dots bar (point bar) for sliders (fill in init method, but it increases the load on the client side)
+    arrBackgroundImages: [],    // Array with images for show in sliders (was fill in init method)
+    arrSliderViewPoints: [],    // Array of show or not all dots (was fill in init method)
 
-    // Метод для инициализации библиотеки
+    /**
+     * Method create for initializing all parameters and create all DOM elements. Filling all global arrays was here
+     * 
+     * @param {String} sliderClass 
+     * @param {any} opt 
+     */
     Init: function (sliderClass, opt) {
 
-        // Параметры и функции переданные из вне
+        // Getting all parameters from parent script
         if (this.IsObject(opt)) {
 
-            // Принимаем клиентские параметры
+            // Set all options from parent script
             this.SetOption("sliderClass", opt.sliderClass);
             this.SetOption("slideClass", opt.slideClass);
             this.SetOption("sliderNavNextClass", opt.sliderNavNextClass);
+            this.SetOption("sliderNavPrevClass", opt.sliderNavPrevClass);
             this.SetOption("sliderSClass", opt.sliderSecondClass);
             this.SetOption("slidesClass", opt.slidesClass);
             this.SetOption("animateSpeed", opt.animateSpeed);
@@ -77,106 +87,122 @@ var CSlider = {
             this.SetOption("enableKeyBoard", opt.keyboard);
             this.SetOption("startSlide", opt.startSlide);
 
-            // Принимаем клиентские методы
+            // Set callbacks from parent script
             if (this.IsObject(opt.events)) {
 
-                // Следующий слайд
-                if (this.IsFunction(opt.events.beforeNextSlide)) this.fnBeforeNextSlide = opt.events.beforeNextSlide; // при начале работы функции NextSlide
-                if (this.IsFunction(opt.events.afterNextSlide)) this.fnAfterNextSlide = opt.events.afterNextSlide; // в конце работы функции NextSlide
+                // Next slide callbacks
+                if (this.IsFunction(opt.events.beforeNextSlide)) this.fnBeforeNextSlide = opt.events.beforeNextSlide; // before work method NextSlide
+                if (this.IsFunction(opt.events.afterNextSlide)) this.fnAfterNextSlide = opt.events.afterNextSlide; // after work method NextSlide
 
-                // Прошлый слайд
-                if (this.IsFunction(opt.events.beforePrevSlide)) this.fnBeforePrevSlide = opt.events.beforePrevSlide; // при начале работы функции PrevSlide
-                if (this.IsFunction(opt.events.afterPrevSlide)) this.fnAfterPrevSlide = opt.events.afterPrevSlide; // в конце работы функции PrevSlide
+                // Previously slide callbacks
+                if (this.IsFunction(opt.events.beforePrevSlide)) this.fnBeforePrevSlide = opt.events.beforePrevSlide; // before work method PrevSlide
+                if (this.IsFunction(opt.events.afterPrevSlide)) this.fnAfterPrevSlide = opt.events.afterPrevSlide; // after work method PrevSlide
 
-                // Перелистывание слайдов в любую сторону
-                if (this.IsFunction(opt.events.beforeSlideChange)) this.fnBeforeSlideChange = opt.events.beforeSlideChange; // при начале перелистывания
-                if (this.IsFunction(opt.events.afterSlideChange)) this.fnAfterSlideChange = opt.events.afterSlideChange; // при окончании перелистывания
+                // Flipping slides callbacks
+                if (this.IsFunction(opt.events.beforeSlideChange)) this.fnBeforeSlideChange = opt.events.beforeSlideChange; // before turning the slide (before change)
+                if (this.IsFunction(opt.events.afterSlideChange)) this.fnAfterSlideChange = opt.events.afterSlideChange; // after turning the slide (after change)
 
             }
         }
 
+        // If we are has slider className, then set that data in our state
         if (sliderClass != null && !this.IsUndefined(sliderClass) && this.IsString(sliderClass)) {
-            if (sliderClass.length >= 2) this.sliderClass = sliderClass; // Устанавливаем класс для слайдеров
+            if (sliderClass.length >= 2) this.sliderClass = sliderClass; // Set className for slider
         }
 
-        this.sliders = this.GetListByClass(this.sliderClass); // Находим все слайдеры на странице по классу
+        // Find all sliders on page
+        this.sliders = this.GetListByClass(this.sliderClass);
 
-        this.ReLoad();
+        // Rendering our sliders
+        this.Rendering();
 
-        // Подключаем событие resize
+        // Add method this.OnResize to window listener on Resize event
         window.addEventListener('resize', this.OnResize);
 
+        // If need to enable work keyboard in slider, than to do this :)
         if (this.enableKeyBoard) {
             window.addEventListener('keydown', this.KeyPress);
         }
     },
 
-    // Перезагрузка библиотеки
-    ReLoad: function () {
+    /**
+     * 
+     * Rendering for all sliders
+     * 
+     */
+    Rendering: function () {
 
-        // итерируем все слайдеры на странице
-        for (var index in this.sliders) {
+        // Iterating all sliders
+        // I know! I can use arrayPrototype.forEach(() => {...}), but we need many support browsers
+        for (let index in this.sliders) {
+            
+            // If index more than or equal 0, than we are work with this slider
             if (this.intval(index) >= 0) {
-                this.arrBackgroundImages[index] = [];
-                this.slider = this.sliders[index]; // получаем слайдер № index
-                this.arrSliders[index] = this.slider; // сохраняем DOM элемент слайдера
-                this.slides = this.FindByClass(this.slider, this.slidesClass)[0]; // получаем элемент div.slides
-                this.countSlidesInSlider = this.slides.childElementCount;         // Получаем количество слайдов
 
-                // Если количество слайдов больше либо равно 1
+                // Set all global params in arrays
+                this.arrBackgroundImages[index] = [];   // Creating child array for fillable slider images
+                this.slider = this.sliders[index];      // Getting slider item
+                this.arrSliders[index] = this.slider;   // Set DOM element by finded slider
+
+                this.slides = this.FindByClass(this.slider, this.slidesClass)[0]; // Getting all slides
+                this.countSlidesInSlider = this.slides.childElementCount;         // Getting count slides from slider
+
+                // If count slides more than or equal 2, than initialize slider methods
                 if (this.countSlidesInSlider >= 2) {
 
-                    // сохраняем полное количество слайдов в слайдере
-                    this.arrCountSlides[index] = this.countSlidesInSlider;            // Сохраняем количество слайдов
-                    this.innerSlider = this.FindByClass(this.slider, this.sliderSClass)[0]; // Получаем инер элемент cslider.slider
-                    this.innerSliderWidth = this.innerSlider.clientWidth; // Получаем ширину для слайда от .slider
+                    // Save al data about slider
+                    this.arrCountSlides[index] = this.countSlidesInSlider;                  // Save count slides by slider
+                    this.innerSlider = this.FindByClass(this.slider, this.sliderSClass)[0]; // Getting child elements by slider
+                    this.innerSliderWidth = this.innerSlider.clientWidth;                   // Getting slider width
 
-                    // количество показываемых слайдов в слайдере
+                    // Count shows slides
                     this.arrCountViewSlide[index] = this.intval(this.GetData(this.slider, "viewSlides"));
                     if (this.arrCountViewSlide[index] <= 0 || this.IsUndefined(this.arrCountViewSlide[index]) || !this.arrCountViewSlide[index]) {
                         this.arrCountViewSlide[index] = 1;
                     }
 
-                    // количество показываемых слайдов в слайдере
+                    // Count shows slides
                     this.arrSliderViewPoints[index] = this.GetData(this.slider, "points") == "N" ? false : true;
                     if (this.IsUndefined(this.arrSliderViewPoints[index]) || !this.arrSliderViewPoints[index]) {
                         this.arrSliderViewPoints[index] = true;
                     }
 
-                    // Получаем пользовательские параметры
-                    this.currentSlide = this.GetData(this.slider, "startSlide"); // показать с слайда
-                    this.arrMaxSpeedDelimiter[index] = parseFloat(this.GetData(this.slider, "maxSpeedDelimiter")); // ограничитель скорости
+                    // Getting data parameters from slides
+                    this.currentSlide = this.GetData(this.slider, "startSlide"); // show this slide
+                    this.arrMaxSpeedDelimiter[index] = parseFloat(this.GetData(this.slider, "maxSpeedDelimiter")); // speed limited
+
+                    // If speed not was limited in data params, than set default speed for slider
                     if (!this.arrMaxSpeedDelimiter[index] || this.arrMaxSpeedDelimiter[index] < 1 || this.IsUndefined(this.arrMaxSpeedDelimiter[index])) {
                         this.arrMaxSpeedDelimiter[index] = 3;
                     }
 
-                    // Получаем ограничитель скорости слайдера
-                    this.arrSpeedDelimiterIterator[index] = parseFloat(this.GetData(this.slider, "speedDelimiter")); // ограничитель скорости 2
+                    // Set another limit for slide or set default speed
+                    this.arrSpeedDelimiterIterator[index] = parseFloat(this.GetData(this.slider, "speedDelimiter")); // another speed limited
                     if (!this.arrSpeedDelimiterIterator[index] || this.arrSpeedDelimiterIterator[index] < 1 || this.IsUndefined(this.arrSpeedDelimiterIterator[index])) {
                         this.arrSpeedDelimiterIterator[index] = 3;
                     }
 
-                    // Получаем набор точек нашего слайдера
+                    // Getting all dots panels for slider
                     this.arrPoints[index] = this.FindByClass(this.slider, this.pointsClass)[0];
                     if (this.IsObject(this.arrPoints[index])) {
                         this.arrEnablePoints[index] = true;
 
-                        // Теперь адаптируемся, что нам нужно создавать будет в точках
+                        // Here we adapt for creating next dots pattern
                         this.ExamplePoint = this.arrPoints[index].firstElementChild.cloneNode(true);
                         this.ExamplePoint.classList.remove(this.pointCurrentClass);
 
-                        this.arrPoints[index].innerHTML = "";
+                        this.arrPoints[index].innerHTML = ""; // Clear DOM element
                     } else {
                         this.arrEnablePoints[index] = false;
                     }
 
-                    // Задаем первую анимацию
+                    // Set first animate
                     this.slides.style.transition = "all " + this.animateSpeed + " ease";
 
-                    // Получаем все слайды
+                    // Getting all slides for slider
                     this.slidesElements = this.FindByClass(this.slides, this.slideClass)
-                    this.slidesWidth = 0; // для подсчета ширины div.slide
-                    slideIndex = 0; // итератор
+                    this.slidesWidth = 0; // for counted slide width
+                    slideIndex = 0; // iterator
 
                     if (this.IsUndefined(this.currentSlide) || this.currentSlide <= -1) {
                         this.currentSlide = 0;
@@ -184,150 +210,187 @@ var CSlider = {
                         this.currentSlide = this.intval(this.currentSlide);
                     }
 
-                    // получаем блок навигации
+                    // Getting navigation panel
                     this.sliderNav = this.FindByClass(this.slider, this.sliderNavClass)[0];
 
+                    // Create slideImages array, for temporary save images by slide
                     this.slideImages = [];
 
 
-                    // Итерируем все слайды в слайдере
+                    // While our slide index is less than or equal count slides in slider, we are iterating
+                    // Yes, i know Bro, don't worry, pls (forEach)
                     while (slideIndex <= this.countSlidesInSlider - 1) {
 
-                        this.slide = this.slidesElements[slideIndex] // нужный слайд
+                        this.slide = this.slidesElements[slideIndex] // our slide
 
                         this.slide.style.width = (this.innerSliderWidth / this.arrCountViewSlide[index]) + "px";
 
                         if (typeof this.slide != this.undef) {
-                            this.slideWidth = this.innerSliderWidth / this.arrCountViewSlide[index]; // сохраним ширину слайда для первого сдвига
-                            this.slidesWidth += this.slideWidth; // прибавляем ширину слайдера к общей ширине div.slides
+                            this.slideWidth = this.innerSliderWidth / this.arrCountViewSlide[index]; // save slider width for the first transform shift
+                            this.slidesWidth += this.slideWidth; // add slider width to total width
                         }
 
-                        this.SetData(this.slide, "slider", index);
-                        this.SetData(this.slide, "slide", slideIndex);
+                        // Set data parameters to slide
+                        this.SetData(this.slide, "slider", index); // set data parameter to slide
+                        this.SetData(this.slide, "slide", slideIndex); // set data parameter to slide
 
-                        // получаем изображение для слайда
+                        // Getting image to slide
                         this.arrBackgroundImages[index][slideIndex] = this.GetData(this.slide, "backgroundImage");
+                        
+                        // If image url has normal string, than save and show this slide else set null
                         if (!this.IsString(this.arrBackgroundImages[index][slideIndex]) || this.arrBackgroundImages[index][slideIndex].length <= 0) {
-                            this.arrBackgroundImages[index][slideIndex] = null;
+                            
+                            this.arrBackgroundImages[index][slideIndex] = null; // set null, if we cant find normal background image url
+
                         } else {
+
+                            // Show first and second slide
                             if (slideIndex <= 1) {
-                                // включаем первый и второй слайд сразу
                                 this.slideImages[slideIndex] = this.FindByClass(this.slidesElements[slideIndex], "image")[0];
                                 this.slideImages[slideIndex].style.backgroundImage = "url('" + this.arrBackgroundImages[index][slideIndex] + "')";
                             }
                         }
 
-                        // включаем анимацию
+                        // Enable animation
                         this.SetTransition(this.slide, false);
 
-                        // добавляем точки для слайдера если нужно
+                        // Add dots to point panel if needed
                         if (this.arrEnablePoints[index]) {
-                            this.clonePoint = this.ExamplePoint.cloneNode(true);
-                            pointText = this.GetData(this.slide, "textPoint");
-                            this.clonePoint.innerHTML = pointText != "N" && typeof pointText != "undefined" ? pointText : "";
-                            this.clonePoint.dataset.sliderId = index;
-                            this.clonePoint.dataset.slideIndex = slideIndex;
-                            this.lastAppendPoint = this.arrPoints[index].appendChild(this.clonePoint);
-                            if (slideIndex == 0) this.lastAppendPoint.classList.add(this.pointCurrentClass);
-                            this.clonePoint.onclick = function (event) {
+                            
+                            // Set another data for points
+                            let pointText = this.GetData(this.slide, "textPoint");
+
+                            this.clonePoint = this.ExamplePoint.cloneNode(true);                        // Clone pattern DOM element for dots item
+                            this.clonePoint.dataset.sliderId = index;                                   // Set data parameter with slide ID
+                            this.clonePoint.dataset.slideIndex = slideIndex;                            // Set data parameter to DOM element with data about slder index
+                            this.lastAppendPoint = this.arrPoints[index].appendChild(this.clonePoint);  // Save last append point
+
+                            // If point need to has plain text, than set that
+                            if (pointText != "N" && typeof pointText != "undefined") {
+                                this.clonePoint.innerHTML = pointText; // Add plain text to point DOM element
+                            }
+
+                            // If now slide index equal zero, than set current className to point
+                            if (slideIndex == 0) {
+                                this.lastAppendPoint.classList.add(this.pointCurrentClass);
+                            }
+                            
+                            // Add event onClick to point
+                            this.clonePoint.addEventListener('click', function(event) {
                                 event.preventDefault();
                                 if (this.classList.contains("current")) return false;
                                 CSlider.viewSlide(parseInt(this.dataset.slideIndex), parseInt(this.dataset.sliderId));
-                            }
-                            this.clonePoint.ontouchend = this.clonePoint.onclick;
+                            });
+
+                            // Fix for only touch events
+                            this.clonePoint.addEventListener('touchend', this.clonePoint.onclick);
+
                         }
 
-                        ++slideIndex; // итерируем итератор
+                        ++slideIndex;
                     }
-                    // Конец итерации слайдов в слайдере
+                    // end of While slides iterator
 
+                    // Set another variables for slider
                     this.arrSlidersWidth[index] = this.slidesWidth;
 
-                    this.SetWidth(this.slides, this.slidesWidth); // Устанавливаем ширину div.slides
-                    this.SetTransfromX(this.slides, 0); // Устанавливаем первую трансформацию слайдеру
+                    this.SetWidth(this.slides, this.slidesWidth);   // Set slider width for container with slides
+                    this.SetTransfromX(this.slides, 0);             // Set first transform shift for slide with zero index
 
-                    this.arrTransforms[index] = 0; // сохраняем в библиотеке значение трансформации текущего слайдера
-                    this.arrActiveSlide[index] = this.currentSlide; // сохраняем номер активного слайда в библиотеке текущего слайдера
-                    this.arrSlideWidth[index] = this.slideWidth; // сохраняем номер активного слайда в библиотеке текущего слайдера
+                    this.arrTransforms[index] = 0;                  // save in our object value about now shift transformation in slider
+                    this.arrActiveSlide[index] = this.currentSlide; // save current slide in slider
+                    this.arrSlideWidth[index] = this.slideWidth;    // save slider width
 
-                    this.SetData(this.slider, "slider", index); // Устанавливаем id для .cslider
-                    this.SetData(this.slider, "countSlides", this.countSlidesInSlider); // Устанавливаем id для .cslider
+                    this.SetData(this.slider, "slider", index); // Set data parameter
+                    this.SetData(this.slider, "countSlides", this.countSlidesInSlider); // Set data parameter
 
-                    // Получаем элемент содержащий в себе навигацию
+                    // Getting navigation panel
                     this.navigation = this.FindByClass(this.slider, this.sliderNavClass)[0];
-                    if (this.IsObject(this.navigation)) { // если блок существует
-                        this.prevButton = this.FindByClass(this.navigation, this.sliderNavPrevClass)[0]; // получаем кнопку назад
-                        this.nextButton = this.FindByClass(this.navigation, this.sliderNavNextClass)[0]; // получаем кнопку вперед
-                        this.arrNav[index] = { prev: this.prevButton, next: this.nextButton, nav: this.navigation };
+                    
+                    // If navigation panel is has
+                    if (this.IsObject(this.navigation)) {
+                        this.prevButton = this.FindByClass(this.navigation, this.sliderNavPrevClass)[0];                // Set previous button
+                        this.nextButton = this.FindByClass(this.navigation, this.sliderNavNextClass)[0];                // Set next button
+                        this.arrNav[index] = { prev: this.prevButton, next: this.nextButton, nav: this.navigation };    // Save data in global object array
                     }
 
-                    // если кнопка назад существует
+                    // If previous button is has find on page
                     if (this.IsObject(this.prevButton)) {
-                        this.arrNav[index]["isSetPrev"] = true;
-                        this.SetData(this.prevButton, "slider", index);
-                        this.prevButton.onclick = function (event) {
+                        
+                        this.arrNav[index]["isSetPrev"] = true; // Save flag for script know, has button or not
+                        this.SetData(this.prevButton, "slider", index); // Set data parameter for prev button
+
+                        // Set onClick event to previous button
+                        this.prevButton.addEventListener('click', function (event) {
                             event.preventDefault();
                             this.slider = CSlider.intval(CSlider.GetData(this, "slider"));
                             CSlider.prevSlide(this.slider);
-                        }
-                        this.prevButton.ontouchend = this.prevButton.onclick;
-                        this.prevButton.classList.add(this.navClassDisabled);
+                        });
+
+                        // Fix for touched devices only
+                        this.prevButton.addEventListener('touchend', this.prevButton.onclick);
+                        this.prevButton.classList.add(this.navClassDisabled); // Set disabled button
                     }
 
-                    // если кнопка вперед существует
+                    // If next button was find
                     if (this.IsObject(this.nextButton)) {
-                        this.arrNav[index]["isSetNext"] = true;
-                        this.SetData(this.nextButton, "slider", index);
-                        this.nextButton.onclick = function (event) {
+                        
+                        this.arrNav[index]["isSetNext"] = true; // Save flag for script know, has button or not
+                        this.SetData(this.nextButton, "slider", index); // Set data parameter for next button
+
+                        // Set onclick event to next button
+                        this.nextButton.addEventListener('click', function (event) {
                             event.preventDefault();
                             this.slider = CSlider.intval(CSlider.GetData(this, "slider"));
                             CSlider.nextSlide(this.slider);
-                        }
+                        });
+
+                        // Fix for touched devices only
                         this.nextButton.ontouchend = this.nextButton.onclick;
-                        this.nextButton.classList.remove(this.navClassDisabled);
+                        this.nextButton.classList.remove(this.navClassDisabled); // Set disabled button
                     }
 
-                    // проверяем нужно ли показывать навигацию по количеству элементов
+                    // Is testing, need show navigations buttons and bars or not
                     if (this.arrCountSlides[index] <= this.arrCountViewSlide[index]) {
                         this.arrNav[index].nav.style.display = "none";
 
-                        // иначе если колчество элементов больше, то задаем события
+                    // Else if normal count items
                     } else {
 
-                        // подключаем события нажатия кнопки мыши
-                        this.slider.onmousedown = function (event) {
+                        // Add event to mouse down on slider
+                        this.slider.addEventListener('mousedown', function (event) {
                             if (typeof event.clientX != "number") event.clientX = event.touches[0].clientX;
                             if (typeof event.clientY != "number") event.clientY = event.touches[0].clientY;
                             CSlider.OnDragStart(this, event);
-                        }
+                        });
 
-                        // подключаем событие перемещения кнопки мыши по слайдеру
-                        this.slider.onmousemove = function (event) {
+                        // Add event mouse move to slider
+                        this.slider.addEventListener('mousemove', function (event) {
                             if (typeof event.clientX != "number") event.clientX = event.touches[0].clientX;
                             if (typeof event.clientY != "number") event.clientY = event.touches[0].clientY;
                             if (CSlider.enableDrag) {
                                 CSlider.OnDragMove(this, event);
                             }
-                        }
+                        });
 
-                        // подключаем события отжатия кнопки мыши
-                        this.slider.onmouseup = function (event) {
+                        // Add event to mouse up on slider
+                        this.slider.addEventListener('mouseup', function (event) {
                             event.preventDefault();
                             if (typeof event.clientX != "number") event.clientX = event.changedTouches[0].clientX;
                             if (typeof event.clientY != "number") event.clientY = event.changedTouches[0].clientY;
                             CSlider.OnDragEnd(this, event);
                             return true;
-                        }
+                        });
 
-                        // повторяем подключения для тач устройств
-                        this.slider.ontouchstart = this.slider.onmousedown;
-                        this.slider.ontouchmove = this.slider.onmousemove;
-                        this.slider.ontouchend = this.slider.onmouseup;
+                        // FIX: repeat all events for only touch devices
+                        this.slider.addEventListener('touchstart', this.slider.onmousedown);
+                        this.slider.addEventListener('touchmove', this.slider.onmousemove);
+                        this.slider.addEventListener('touchend', this.slider.onmouseup);
+                        this.slider.addEventListener('mouseleave', this.slider.onmouseup);
 
-                        this.slider.onmouseleave = this.slider.onmouseup;
-
+                        // To do this for fix bugs with transformation shift on next slides
                         if (this.startSlide >= 2) {
-                            var iter = 0;
+                            let iter = 0;
                             while (iter < this.startSlide) {
                                 this.nextSlide(index);
                                 ++iter;
@@ -340,20 +403,30 @@ var CSlider = {
         }
     },
 
+    /**
+     * On key press on slider event
+     * 
+     * @param {DOMElementEvent} event 
+     */
     KeyPress: function (event) {
         if (event.code == "ArrowRight") {
-            for (var index in CSlider.sliders) {
+            for (let index in CSlider.sliders) {
                 CSlider.nextSlide(index);
             }
         }
         if (event.code == "ArrowLeft") {
-            for (var index in CSlider.sliders) {
+            for (let index in CSlider.sliders) {
                 CSlider.prevSlide(index);
             }
         }
     },
 
-    // Добавление слайдов в любое время в конец слайдера
+    /**
+     * Append slides in end to slider
+     * 
+     * @param {DOMElement} slidesElements 
+     * @param {int} sliderId 
+     */
     AppendSlides: function (slidesElements, sliderId) {
         if (this.IsObject(slidesElements)) {
             sliderId = parseInt(sliderId);
@@ -367,14 +440,18 @@ var CSlider = {
                 }
 
                 return true;
-            } else {
-                return false;
             }
-        } else {
-            return false;
         }
+
+        return false;
     },
 
+    /**
+     * Append slide to end slider by sliderId
+     * 
+     * @param {DOMElement} slideElement 
+     * @param {int} sliderId 
+     */
     AppendSlide: function (slideElement, sliderId) {
         sliderId = parseInt(sliderId);
         if (this.IsObject(slideElement) && sliderId >= 0 && sliderId) {
@@ -384,47 +461,63 @@ var CSlider = {
 
             if (this.IsObject(this.slides)) {
                 if (this.AppendChild(this.slides, slideElement)) {
-                    console.log("ADDED");
                     return true;
                 } else {
                     return false;
                 }
-            } else {
-                return false;
             }
-        } else return false;
+        }
+
+        return false;
     },
 
+    /**
+     * For lazy load images
+     * 
+     * @param {Array} ArSlides 
+     * @param {int} SliderId 
+     */
     LoadIMGSlides: function (ArSlides, SliderId) {
         if (typeof ArSlides != "object") return false;
         if ((!parseInt(SliderId) && parseInt(SliderId) != 0) || parseInt(SliderId) <= -1) return false;
 
-        var slider = this.sliders[SliderId];
-        var bslides = this.FindByClass(slider, this.slidesClass)[0];
+        let slider = this.sliders[SliderId];
+        let bslides = this.FindByClass(slider, this.slidesClass)[0];
 
         bslides.innerHTML = "";
         this.SetTransition(slider, true);
 
-        for (var i = 0; i < ArSlides.length; i++) {
+        // Bro i still know, but i want to do this :) pls dont worry
+        for (let i = 0; i < ArSlides.length; i++) {
             slide = ArSlides[i];
             pointText = slide.pointText;
 
             bslide = document.createElement('div');
             bslide.classList.add(this.slideClass);
             bslide.style.backgroundImage = "url('" + slide.src + "')";
-            if (typeof pointText == "string") bslide.dataset.textPoint = slide.pointText;
-            else bslide.dataset.textPoint = "N";
+            
+            if (typeof pointText == "string") {
+                bslide.dataset.textPoint = slide.pointText;
+            } else {
+                bslide.dataset.textPoint = "N";
+            }
+
             bslides.appendChild(bslide);
         }
 
-        this.ReLoad();
+        this.Rendering(); // Rendering slider
 
     },
 
+    /**
+     * For add event on resize browser window
+     * 
+     * @param {DOMElementEvent} event 
+     */
     OnResize: function (event) {
         CSlider.sliders = CSlider.GetListByClass(CSlider.sliderClass);
-        var widthSlider = 0;
-        for (var index in CSlider.sliders) {
+        let widthSlider = 0;
+        for (let index in CSlider.sliders) {
             if (index >= 0) {
                 CSlider.slider = CSlider.sliders[index];
                 CSlider.innerSlider = CSlider.FindByClass(CSlider.slider, CSlider.sliderSClass)[0];
@@ -435,14 +528,14 @@ var CSlider = {
 
                 CSlider.countSlidesInSlider = CSlider.slides.childElementCount;
 
-                var slideIndex = 0;
+                let slideIndex = 0;
                 while (slideIndex <= CSlider.countSlidesInSlider - 1) {
 
                     CSlider.slide = CSlider.slidesElements[slideIndex];
 
                     if (!CSlider.IsUndefined(CSlider.slide)) {
                         CSlider.slide.style.width = (widthSlider / CSlider.arrCountViewSlide[index]) + "px";
-                        CSlider.slideWidth = widthSlider / CSlider.arrCountViewSlide[index]; // сохраним ширину слайда для первого сдвига
+                        CSlider.slideWidth = widthSlider / CSlider.arrCountViewSlide[index]; // save width for first shift
                         CSlider.slidesWidth += CSlider.slideWidth;
                     }
 
@@ -462,10 +555,15 @@ var CSlider = {
         }
     },
 
-    // При старте перетаскивания
+    /**
+     * Event on slide draggable start
+     * 
+     * @param {Object} _this 
+     * @param {DOMElementEvent} event 
+     */
     OnDragStart: function (_this, event) {
 
-        var slider_id = parseInt(CSlider.GetData(_this, "slider"));
+        let slider_id = parseInt(CSlider.GetData(_this, "slider"));
 
         CSlider.ScrollEnable = false;
         CSlider.SliderMoveEnable = false;
@@ -485,15 +583,16 @@ var CSlider = {
             this.enableDrag = true;
             this.sizeTransformXToSwipe = this.arrSlidersWidth[slider_id] / this.percentToSwipe;
         }
-
-        // alert(event.clientY);
     },
 
-    // При перетаскивании
+    /**
+     * Event on slide move
+     * 
+     * @param {Object} _this
+     * @param {any} event 
+     */
     OnDragMove: function (_this, event) {
         if (CSlider.enableDrag) {
-
-            // alert(event.clientY);
 
             if (window.getSelection) {
                 window.getSelection().removeAllRanges();
@@ -556,22 +655,16 @@ var CSlider = {
             this.SetTransfromX(_this.slides, _this.transformX);
             this.arrTransforms[_this.selSliderId] = _this.transformX;
 
-
-            // Если нужно перелистываем слайдер и отключаем draggable
-            // if(this.sizeTransformXToSwipe < _this.transformXIsTest) {
-            //   this.enableDrag = false;
-            //   if(!this.prevSlide(_this.selSliderId)) this.standartedSlideTransform(_this.selSliderId);
-            // } else if(-this.sizeTransformXToSwipe > _this.transformXIsTest) {
-            //   this.enableDrag = false;
-            //   if(!this.nextSlide(_this.selSliderId)) this.standartedSlideTransform(_this.selSliderId);
-            // }
-
         }
     },
 
-    // При окончании перетаскивания
+    /**
+     * Event on draggable slide ended
+     * 
+     * @param {Object} _this 
+     * @param {DOMElementEvent} event 
+     */
     OnDragEnd: function (_this, event) {
-        // alert("ASD")
         if (!CSlider.enableDrag) return false;
         CSlider.enableDrag = false;
         _this.selSliderId = this.intval(this.GetData(_this, this.sliderSClass));
@@ -588,7 +681,6 @@ var CSlider = {
             } else {
                 CSlider.standartedSlideTransform(parseInt(_this.selSliderId));
             }
-            // return true;
         }
 
         if (this.isTestTransformX > this.sizeTransformXToSwipe) {
@@ -613,11 +705,16 @@ var CSlider = {
             return true;
         }
 
+        // I'm dont trust :)
         CSlider.standartedSlideTransform(parseInt(_this.selSliderId));
         return true;
     },
 
-    // Выравниваем слайд
+    /**
+     * Set default shift transforms for slides in slider by sliderId
+     * 
+     * @param {int} slider_id 
+     */
     standartedSlideTransform: function (slider_id) {
 
         this.slider = this.arrSliders[slider_id];
@@ -628,12 +725,17 @@ var CSlider = {
 
     },
 
-    // Следующий слайд
+    /**
+     * Show next slide
+     * 
+     * @param {int} slider_id 
+     */
     nextSlide: function (slider_id) {
-        // Пользовательские функции
+
+        // Run parrent callbacks
         if (this.IsFunction(this.fnBeforeNextSlide)) this.fnBeforeNextSlide(event);
         if (this.IsFunction(this.fnBeforeSlideChange)) this.fnBeforeSlideChange();
-        // end Пользовательские функции
+        // end Run parrent callbacks
 
         this.slider = this.sliders[slider_id];
 
@@ -641,20 +743,22 @@ var CSlider = {
 
         this.slides = this.FindByClass(this.slider, this.slidesClass)[0];
 
-        // включаем анимацию
+        // Enable animation
         this.OnTransition(this.slides);
 
-        // сохраняем последний слайд
+        // Save last slide
         this.oldActiveSlide = this.arrActiveSlide[slider_id];
 
-        // проверяем не последний ли слайд
+        // Iterating now slide
         this.arrActiveSlide[slider_id] += 1;
+
+        // Testing is last slide
         if (this.arrActiveSlide[slider_id] > this.arrCountSlides[slider_id] - this.arrCountViewSlide[slider_id]) {
             this.arrActiveSlide[slider_id] = this.oldActiveSlide;
             return false;
         }
 
-        // блокируем кнопку или нет
+        // Blocked navigation buttons or not
         if (this.IsObject(this.arrNav[slider_id])) {
             this.arrActiveSlide[slider_id] += 1;
             if (this.arrActiveSlide[slider_id] > this.arrCountSlides[slider_id] - this.arrCountViewSlide[slider_id]) {
@@ -670,10 +774,13 @@ var CSlider = {
             if (this.arrNav[slider_id].isSetPrev) this.arrNav[slider_id].prev.classList.remove(this.navClassDisabled);
         }
 
+        // Find active slide
         this.activeSlideElement = this.FindByClass(this.slides, this.slideClass)[this.arrActiveSlide[slider_id]];
+
+        // Find old active slide
         this.oldActiveSlideElement = this.FindByClass(this.slides, this.slideClass)[this.oldActiveSlide];
 
-
+        // Testing is has className in activeSlide
         if (!this.activeSlideElement.classList.contains(this.activeSlideClass)) {
             this.activeSlideElement.classList.add(this.activeSlideClass);
             this.oldActiveSlideElement.classList.remove(this.activeSlideClass);
@@ -682,11 +789,11 @@ var CSlider = {
         this.arrTransforms[slider_id] = -this.arrSlideWidth[slider_id] * this.arrActiveSlide[slider_id];
         this.SetTransfromX(this.slides, this.arrTransforms[slider_id]);
 
-        // Работаем с точками если они подключены
+        // Work with points if they is enabled
         if (this.arrEnablePoints[slider_id]) {
             this.lastBlockPoints = this.arrPoints[slider_id];
             this.lastPoints = this.lastBlockPoints.children;
-            for (var i = 0; i < this.lastPoints.length; i++) {
+            for (let i = 0; i < this.lastPoints.length; i++) {
                 this.lastPoint = this.lastPoints[i];
                 this.lastPoint.classList.remove(this.pointCurrentClass);
             }
@@ -694,10 +801,9 @@ var CSlider = {
         }
 
         this.SlidesElements = this.FindByClass(this.slides, this.slideClass);
-
         this.slideImages = [];
 
-        // Подгрузим изображения слайдов если это нужно
+        // Lazy loading another images, if this is needed now to do
         if (this.arrBackgroundImages[slider_id][this.arrActiveSlide[slider_id]] !== null) {
 
             this.slideImages[0] = this.FindByClass(this.SlidesElements[this.arrActiveSlide[slider_id]], "image")[0];
@@ -707,26 +813,32 @@ var CSlider = {
                 this.slideImages[1] = this.FindByClass(this.SlidesElements[this.arrActiveSlide[slider_id] + 1], "image")[0];
                 this.slideImages[1].style.backgroundImage = "url('" + this.arrBackgroundImages[slider_id][this.arrActiveSlide[slider_id] + 1] + "')";
             }
+
             if (this.IsObject(this.SlidesElements[this.arrActiveSlide[slider_id] + 2])) {
                 this.slideImages[2] = this.FindByClass(this.SlidesElements[this.arrActiveSlide[slider_id] + 2], "image")[0];
                 this.slideImages[2].style.backgroundImage = "url('" + this.arrBackgroundImages[slider_id][this.arrActiveSlide[slider_id] + 2] + "')";
             }
         }
 
-        // Пользовательские функции
+        // Run parrent callbacks
         if (this.IsFunction(this.fnAfterNextSlide)) this.fnAfterNextSlide(event);
         if (this.IsFunction(this.fnAfterSlideChange)) this.fnAfterSlideChange();
-        // end Пользовательские функции
+        // end Run parrent callbacks
 
         return true;
     },
 
-    // Прошлый слайд
+    /**
+     * Show previous slide
+     * 
+     * @param {int} slider_id 
+     */
     prevSlide: function (slider_id) {
-        // Пользовательские функции
+
+        // Run parrent callbacks
         if (this.IsFunction(this.fnBeforePrevSlide)) this.fnBeforePrevSlide();
         if (this.IsFunction(this.fnBeforeSlideChange)) this.fnBeforeSlideChange();
-        // end Пользовательские функции
+        // end of Run parrent callbacks
 
         this.slider = this.arrSliders[slider_id];
         this.slides = this.FindByClass(this.slider, this.slidesClass)[0];
@@ -740,7 +852,7 @@ var CSlider = {
             return false;
         }
 
-        // блокируем кнопку или нет
+        // Disabling next or back button
         if (this.IsObject(this.arrNav[slider_id])) {
             if (this.arrActiveSlide[slider_id] <= 0) {
                 if (this.arrNav[slider_id].isSetPrev) {
@@ -765,33 +877,38 @@ var CSlider = {
         this.arrTransforms[slider_id] = -this.arrSlideWidth[slider_id] * this.arrActiveSlide[slider_id];
         this.SetTransfromX(this.slides, this.arrTransforms[slider_id]);
 
-        // Работаем с точками если они подключены
+        // Working with dots if this is needed
         if (this.arrEnablePoints[slider_id]) {
             this.lastBlockPoints = this.arrPoints[slider_id];
             this.lastPoints = this.lastBlockPoints.children;
-            for (var i = 0; i < this.lastPoints.length; i++) {
+            for (let i = 0; i < this.lastPoints.length; i++) {
                 this.lastPoint = this.lastPoints[i];
                 this.lastPoint.classList.remove(this.pointCurrentClass);
             }
             this.lastPoints[this.arrActiveSlide[slider_id]].classList.add(this.pointCurrentClass);
         }
 
-        // Пользовательские функции
+        // Run parrent callbacks
         if (this.IsFunction(this.fnAfterPrevSlide)) this.fnAfterPrevSlide();
         if (this.IsFunction(this.fnAfterSlideChange)) this.fnAfterSlideChange();
-        // end Пользовательские функции
+        // end Run parrent callbacks
 
         return true;
     },
 
-    // Показать нужный слайд
+    /**
+     * Show slide (slide_id) in slider (slider_id)
+     * 
+     * @param {int} slide_id 
+     * @param {int} slider_id 
+     */
     viewSlide: function (slide_id, slider_id = 0) {
         slide_id = parseInt(slide_id);
         if (isNaN(slide_id) || slide_id <= -1) return false;
 
-        // Пользовательские функции
+        // Fixed another bugs with moves
         if (this.IsFunction(this.fnBeforeSlideChange)) this.fnBeforeSlideChange();
-        // end Пользовательские функции
+        // end of Fixed another bugs with moves
 
         this.oldActiveSlide = this.arrActiveSlide[slider_id];
 
@@ -813,25 +930,29 @@ var CSlider = {
         this.arrTransforms[slider_id] = -this.arrSlideWidth[slider_id] * this.arrActiveSlide[slider_id];
         this.SetTransfromX(this.slides, this.arrTransforms[slider_id]);
 
-        // Работаем с точками если они подключены
+        // Work with dots
         if (this.arrEnablePoints[slider_id]) {
             this.lastBlockPoints = this.arrPoints[slider_id];
             this.lastPoints = this.lastBlockPoints.children;
-            for (var i = 0; i < this.lastPoints.length; i++) {
+            for (let i = 0; i < this.lastPoints.length; i++) {
                 this.lastPoint = this.lastPoints[i];
                 this.lastPoint.classList.remove(this.pointCurrentClass);
             }
             this.lastPoints[this.arrActiveSlide[slider_id]].classList.add(this.pointCurrentClass);
         }
 
-        // Пользовательские функции
+        // Fixed another bugs with moves
         if (this.IsFunction(this.fnAfterSlideChange)) this.fnAfterSlideChange();
-        // end Пользовательские функции
+        // end of Fixed another bugs with moves
 
         return true;
     },
 
-    // Enable transition for .slides
+    /**
+     * Enable transition in slider
+     * 
+     * @param {DOMElement} slides 
+     */
     OnTransition: function (slides) {
         if (typeof slides == "object") {
             return this.SetTransition(slides, false);
@@ -841,7 +962,11 @@ var CSlider = {
         } else return false;
     },
 
-    // Disabled transition for .slides
+    /**
+     * Disable transition in slider
+     * 
+     * @param {DOMElement} slides 
+     */
     OffTransition: function (slides) {
         if (typeof slides == "object") {
             return this.SetTransition(slides, true);
@@ -851,14 +976,27 @@ var CSlider = {
         } else return false;
     },
 
-    /* Ниже идут функции, обрамление для нативных функций  */
+    /* 
+     *
+     * Below are functions, framing for native functions
+     *
+     * */
 
-    // Получить все элементы имеющие класс class_name
+    /**
+     * Get all elements with class class_name
+     * 
+     * @param {String} class_name 
+     */
     GetListByClass: function (class_name) {
         return this.FindByClass(document, class_name);
     },
 
-    // Установить transition
+    /**
+     * Set transition to DOM element
+     * 
+     * @param {Object} object 
+     * @param {Boolean} isOff 
+     */
     SetTransition: function (object, isOff) {
         if (typeof object == "object") {
             if (isOff) {
@@ -871,7 +1009,13 @@ var CSlider = {
         }
     },
 
-    // Добавление элементов в объект
+    /**
+     * Append child to DOM element
+     * 
+     * @param {Object} object 
+     * @param {DOMElement} appendItem 
+     * @param {int} objectIndex 
+     */
     AppendChild: function (object, appendItem, objectIndex = 0) {
         if (this.IsObject(object)) {
             object.appendChild(appendItem);
@@ -890,73 +1034,144 @@ var CSlider = {
         }
     },
 
-    // Проверка свойства на функцию
+    /**
+     * Checking a property against a function
+     * 
+     * @param {any} variable 
+     */
     IsFunction: function (variable) {
         return this.IsType(variable, this.fn);
     },
 
-    // Проверка свойства на объект
+    /**
+     * Checking a property on an object
+     * 
+     * @param {any} variable 
+     */
     IsObject: function (variable) {
         return this.IsType(variable, this.object);
     },
 
-    // Проверка на строку
+    /**
+     * Checking a property is an string
+     * 
+     * @param {any} variable 
+     */
     IsString: function (variable) {
         return this.IsType(variable, this.string);
     },
 
-    // Проверка на существование переменной
+    /**
+     * Checking a property on an undefined
+     * 
+     * @param {any} variable 
+     */
     IsUndefined(variable) {
         return this.IsType(variable, this.undef);
     },
 
-    // Проверка типа
+    /**
+     * Compare variable type and type name
+     * 
+     * @param {any} variable 
+     * @param {String} type 
+     */
     IsType(variable, type) {
         if (typeof variable == type) return true; else return false;
     },
 
-    // Установка значения transform для элемента DOM страницы
+    /**
+     * Set tramsform to DOM element
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {float} transformPX 
+     */
     SetTransfromX: function (DOMElement, transformPX) {
         return DOMElement.style.transform = "translateX(" + transformPX + "px)";
     },
 
-    // Установка ширины элемента
+    /**
+     * Set width to DOM Element
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {float} widthPX 
+     */
     SetWidth: function (DOMElement, widthPX) {
         return DOMElement.style.width = widthPX + "px";
     },
 
-    // Найти элементы с классом className в элементе DOMElement
+    /**
+     * Find all DOM Elements by className
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {String} className 
+     */
     FindByClass: function (DOMElement, className) {
-        return DOMElement.getElementsByClassName(className);
+        return DOMElement.querySelector('.'+className);
     },
 
-    // Задать атрибут для элемента
+    /**
+     * Set attribute to DOM Element
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {String} attrName 
+     * @param {String} attrValue 
+     */
     SetAttr: function (DOMElement, attrName, attrValue) {
         return DOMElement.setAttribute(attrName, attrValue);
     },
 
-    // Получить значение атрибута
+    /**
+     * Getting attribute from DOM Element
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {String} attrName 
+     */
     GetAttr: function (DOMElement, attrName) {
         return DOMElement.getAttribute(attrName);
     },
 
-    // Установка значения атрибута data к элементу
+    /**
+     * Set data parameter to DOM Element
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {String} dataName 
+     * @param {String} dataValue 
+     */
     SetData: function (DOMElement, dataName, dataValue) {
         return DOMElement.dataset[dataName] = dataValue;
     },
 
-    // Получить значение атрибута data
+    /**
+     * Getting value from data attribute in DOM Element
+     * 
+     * @param {DOMElement} DOMElement 
+     * @param {String} dataName 
+     */
     GetData: function (DOMElement, dataName) {
         return DOMElement.dataset[dataName];
     },
 
 
-    // Преобразование переменной к целочисленному типу
+    /**
+     * Analog for parseInt with testing
+     * 
+     * @param {any} variable 
+     */
     intval: function (variable) {
-        return Math.abs(variable);
+        if (Math.abs(variable) ) {
+            return Math.abs(variable);
+        }
+
+        return 0;
     },
 
-    // Сохраняем свойство
+    /**
+     * Setter for options in object
+     * 
+     * @param {String} optionName 
+     * @param {String} optionValue 
+     */
     SetOption(optionName, optionValue) {
         if (this.IsString(optionValue) || typeof optionValue == "boolean" || typeof optionValue == "number") {
             this[optionName] = optionValue;
@@ -964,3 +1179,5 @@ var CSlider = {
     },
 
 };
+
+window.CSlider = CSlider;
